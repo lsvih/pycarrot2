@@ -1007,7 +1007,9 @@ x = {"searchresult": {
 }
 }
 
-a = Clustering()
+a = Clustering(port=8081)
 
 docs = [Document(title=i['title'], url=i['url'], content=i['snippet']) for i in x['searchresult']['documents']]
+
+
 print(a.cluster(docs, algorithm='lingo'))

@@ -12,12 +12,13 @@ from .document import Document
 
 
 class Clustering:
-    def __init__(self):
+    def __init__(self, port=8080):
         self.host = 'localhost'
-        self.port = 8080
+        self.port = port
         self.path = os.path.dirname(os.path.abspath(__file__))
-        self.process = subprocess.Popen('cd %s; sh dcs.sh' % os.path.join(self.path, 'dcs'), stdout=subprocess.PIPE,
-                                        bufsize=1, shell=True, close_fds=True, preexec_fn=os.setsid)
+        self.process = subprocess.Popen('cd %s; sh dcs.sh -port=%d' %
+                                        (os.path.join(self.path, 'dcs'), self.port), stdout=subprocess.PIPE, bufsize=1,
+                                        shell=True, close_fds=True, preexec_fn=os.setsid)
         for line in self.process.stdout:
             l = line.decode().strip()
             print(l)
