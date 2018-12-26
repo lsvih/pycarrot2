@@ -24,7 +24,7 @@ class Clustering:
             print(l)
             if 'DCS started on port' in l:
                 self.port = int(re.findall(r'port: (.*?) \[', l)[0])
-                atexit.register(os.killpg, self.process.pid, signal.SIGUSR1)
+                atexit.register(os.killpg, self.process.pid, signal.SIGKILL)
                 break
 
     def cluster(self, documents: List[Document], algorithm: str = 'lingo'):
