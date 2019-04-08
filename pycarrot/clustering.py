@@ -33,6 +33,10 @@ class Clustering:
         :param algorithm: String. Default set as lingo, Optional: lingo | kmeans | stc | url | source
         :return: Return Clusters list or raise an Exception.
         """
+        if not isinstance(documents, list):
+            raise ValueError("First parameter(documents) must be a list object.")
+        if not all(map(lambda x:isinstance(x, Document), documents)):
+            raise ValueError("All items in documents list must be a Document instance.")
         data = ''.join([doc() for doc in documents])
         data = '<searchresult><query>query</query>' + data + '</searchresult>'
         req = requests.post(url='http://%s:%d/dcs/rest' % (self.host, self.port),
