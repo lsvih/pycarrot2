@@ -1,7 +1,20 @@
 # pycarrot2
 A python wrapper of carrot2 clustering server.
 
+### Usage
 
+```python
+from pycarrot import Clustering, Document
+
+documents = [{'title':'1','url':'1','content':1},{'title':'2','url':'2','content':2}]
+
+c = Clustering(port=8081)
+docs = [Document(title=doc['title'], url=doc['url'], content=doc['content']) for doc in documents]
+
+result = c.cluster(docs, algorithm='lingo')
+# algorithm could be lingo\kmeans\stc\url\source
+print(result)
+```
 
 ### FAQ
 
