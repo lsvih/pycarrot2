@@ -1,7 +1,17 @@
 # pycarrot2
 A python wrapper of carrot2 clustering server.
 
+Compatible with Linux, macOS and Windows.
+
 ### Usage
+
+Test example:
+
+```bash
+python3 example.py
+```
+
+Usage:
 
 ```python
 from pycarrot import Clustering, Document
