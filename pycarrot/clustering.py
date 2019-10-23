@@ -2,10 +2,11 @@ import atexit
 import json
 import os
 import re
-import signal
 import subprocess
+import sys
 from typing import List
 
+import psutil
 import requests
 
 from .document import Document
@@ -16,16 +17,29 @@ class Clustering:
         self.host = 'localhost'
         self.port = port
         self.path = os.path.dirname(os.path.abspath(__file__))
-        self.process = subprocess.Popen('cd %s; sh dcs.sh -port=%d' %
-                                        (os.path.join(self.path, 'dcs'), self.port), stdout=subprocess.PIPE, bufsize=1,
-                                        shell=True, close_fds=True, preexec_fn=os.setsid)
+        if sys.platform == "win32":
+            self.process = subprocess.Popen('cd %s& dcs.cmd -port=%d' %
+                                            (os.path.join(self.path, 'dcs'), self.port), stdout=subprocess.PIPE,
+                                            bufsize=1,
+                                            shell=True, close_fds=True)
+        else:
+            self.process = subprocess.Popen('cd %s; sh dcs.sh -port=%d' %
+                                            (os.path.join(self.path, 'dcs'), self.port), stdout=subprocess.PIPE,
+                                            bufsize=1,
+                                            shell=True, close_fds=True)
         for line in self.process.stdout:
             l = line.decode().strip()
             print(l)
             if 'DCS started on port' in l:
                 self.port = int(re.findall(r'port: (.*?) \[', l)[0])
-                atexit.register(os.killpg, self.process.pid, signal.SIGKILL)
+                atexit.register(self.kill_dcs)
                 break
+
+    def kill_dcs(self):
+        for child in psutil.Process(self.process.pid).children(recursive=True):
+            child.kill()
+        self.process.terminate()
+        self.process.kill()
 
     def cluster(self, documents: List[Document], algorithm: str = 'lingo'):
         """
@@ -35,7 +49,7 @@ class Clustering:
         """
         if not isinstance(documents, list):
             raise ValueError("First parameter(documents) must be a list object.")
-        if not all(map(lambda x:isinstance(x, Document), documents)):
+        if not all(map(lambda x: isinstance(x, Document), documents)):
             raise ValueError("All items in documents list must be a Document instance.")
         data = ''.join([doc() for doc in documents])
         data = '<searchresult><query>query</query>' + data + '</searchresult>'
