@@ -1,7 +1,7 @@
 class Document:
     def __init__(self, title: str, url: str, content: str):
         self.title = self.escape(title)
-        self.url = url
+        self.url = self.escape(title)
         self.content = self.escape(content)
 
     def __call__(self) -> str:
